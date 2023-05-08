@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>MLTradeReportReader</title>
+		<link rel="stylesheet" href="styles.css" />
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	</head>
+	<body>
+		<h1>MLTradeReportReader</h1>
+		<div class="file-input-container">
+			<input type="file" class="file-input" id="file-input" />
+			<label for="file-input" class="label-file">Choisir un fichier</label>
+			<button onclick="loadJSON()">Charger</button>
+		</div>
+		<div id="container"> </div>
+
+		<script src="singleChartBuilder.js"></script>
+		<script src="script.js"></script>
+	</body>
+</html>

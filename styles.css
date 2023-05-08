@@ -1,0 +1,83 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: white;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    text-align: center;
+    margin: 20px 0;
+}
+
+#chart {
+    width: 800px;
+    height: 400px;
+    margin: 0 auto;
+    
+}
+.chart-container {
+    text-align: center;
+    margin: 10px 0;
+    padding: 50px 0;
+    height: 500px;
+}
+
+h2 {
+  margin-top: 20px;
+  text-align: center;
+}
+
+canvas {
+  margin: 0 auto;
+  display: block;
+  transition: transform 0.2s;
+  width: 80%;
+  padding: 20px;
+  border-radius: 40px;
+}
+
+canvas:hover {
+    background-color: aliceblue;
+}
+
+.file-input-container {
+    position: relative;
+    display: block;
+    margin: auto;
+    width: max-content;
+}
+
+.label-file {
+    cursor: pointer;
+    color: #00b1ca;
+    font-weight: bold;
+    border-radius: 40px;
+    background: white;
+    box-sizing: content-box;
+    border: 3px solid #494ca2;
+    padding: 8px 20px;
+}
+.label-file:hover {
+    color: #25a5c4;
+}
+
+.file-input {
+    display: none;
+}
+
+/* Default Round Bootstrap */
+button {
+    border-radius: 40px;
+    background: #494ca2;
+    border-color: #494ca2;
+    color: #fff;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+button:hover {
+    background: #3a3d85;
+    border-color: #3a3d85;
+    color: #fff;
+    outline: none !important;
+}
