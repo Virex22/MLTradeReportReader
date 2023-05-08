@@ -3,6 +3,7 @@ function generateSingleChart(data) {
 	container.innerHTML = "";
 	generateProfitChart(data);
 	generateBalanceChart(data);
+	generateParametersTable(data);
 }
 
 function createCanvasElement(id, container, title) {
