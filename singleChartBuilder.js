@@ -1,9 +1,9 @@
 function generateSingleChart(data) {
 	const container = document.getElementById("container");
 	container.innerHTML = "";
+	generateParametersTable(data);
 	generateProfitChart(data);
 	generateBalanceChart(data);
-	generateParametersTable(data);
 }
 
 function createCanvasElement(id, container, title) {
@@ -119,4 +119,45 @@ function generateBalanceChart(data) {
 		data: chartData,
 		options: chartOptions,
 	});
+}
+
+function generateParametersTable(data) {
+	var parameterVariations = data.StrategyParameters.ParameterVariations;
+	var parametersContainer = document.createElement("div");
+	parametersContainer.id = "parameters-container";
+
+	var title = document.createElement("h2");
+	title.textContent = "Parametres utilisée";
+	parametersContainer.appendChild(title);
+
+	for (var key in parameterVariations) {
+		var parametersList = document.createElement("div");
+		parametersList.className = "parameters-list";
+
+		var parameter = parameterVariations[key];
+
+		var parameterTitle = document.createElement("h3");
+		parameterTitle.textContent = key;
+		parametersContainer.appendChild(parameterTitle);
+
+		for (var prop in parameter) {
+			var parameterDiv = document.createElement("div");
+			parameterDiv.className = "parameter";
+
+			var propTitle = document.createElement("h4");
+			propTitle.textContent = prop;
+			parameterDiv.appendChild(propTitle);
+
+			var propValue = document.createElement("p");
+			propValue.textContent = parameter[prop];
+			parameterDiv.appendChild(propValue);
+
+			parametersList.appendChild(parameterDiv);
+		}
+
+		parametersContainer.appendChild(parametersList);
+	}
+
+	var container = document.getElementById("container");
+	container.appendChild(parametersContainer);
 }
