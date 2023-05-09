@@ -2,10 +2,70 @@ function generateSingleChart(data) {
 	const container = document.getElementById("container");
 	container.innerHTML = "";
 	generateParametersTable(data);
+	generateGlobalStatistics(data);
 	generateProfitChart(data);
 	generateBalanceChart(data);
 }
+function calculateProfitFactor(trades) {
+	const winningTrades = trades.filter((trade) => trade.ProfitLoss > 0);
+	const losingTrades = trades.filter((trade) => trade.ProfitLoss < 0);
 
+	const totalWinningAmount = winningTrades.reduce(
+		(acc, trade) => acc + trade.ProfitLoss,
+		0
+	);
+	const totalLosingAmount = Math.abs(
+		losingTrades.reduce((acc, trade) => acc + trade.ProfitLoss, 0)
+	);
+
+	if (totalLosingAmount === 0) {
+		return "Infinity";
+	}
+
+	const profitFactor = totalWinningAmount / totalLosingAmount;
+	return profitFactor.toFixed(2);
+}
+
+function generateGlobalStatistics(data) {
+	const statisticsContainer = document.createElement("div");
+	statisticsContainer.classList.add("statistics-container");
+
+	const trades = data.Trades;
+
+	const startDate = new Date(trades[0].EntryTime);
+	const endDate = new Date(trades[trades.length - 1].CloseTime);
+	const diffTime = Math.abs(endDate - startDate);
+	const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+	createStatisticElement(
+		statisticsContainer,
+		"Number of Days",
+		diffDays,
+		" days"
+	);
+	createStatisticElement(
+		statisticsContainer,
+		"Profit Factor",
+		calculateProfitFactor(trades)
+	);
+	let container = document.getElementById("container");
+	container.appendChild(statisticsContainer);
+}
+function createStatisticElement(statisticsContainer, label, value, unit = "") {
+	const statisticElement = document.createElement("p");
+	statisticElement.classList.add("statistic");
+
+	// Créer un élément <span> pour la valeur
+	const valueElement = document.createElement("span");
+	valueElement.textContent = value + unit;
+	valueElement.classList.add("statistic-value");
+
+	// Ajouter le label et l'élément de valeur au conteneur de statistiques
+	statisticElement.innerHTML = `${label}: `;
+	statisticElement.appendChild(valueElement);
+
+	statisticsContainer.appendChild(statisticElement);
+}
 function createCanvasElement(id, container, title) {
 	const canvasContainer = document.createElement("div");
 	canvasContainer.classList.add("chart-container");
@@ -23,21 +83,6 @@ function createCanvasElement(id, container, title) {
 	return canvas;
 }
 
-function createStatisticElement(statisticsContainer, label, value, unit = "") {
-	const statisticElement = document.createElement("p");
-	statisticElement.classList.add("statistic");
-
-	// Créer un élément <span> pour la valeur
-	const valueElement = document.createElement("span");
-	valueElement.textContent = value + unit;
-	valueElement.classList.add("statistic-value");
-
-	// Ajouter le label et l'élément de valeur au conteneur de statistiques
-	statisticElement.innerHTML = `${label}: `;
-	statisticElement.appendChild(valueElement);
-
-	statisticsContainer.appendChild(statisticElement);
-}
 function generateProfitChart(data) {
 	const trades = data.Trades;
 	const profitValues = trades.map((trade) => trade.ProfitLoss);
@@ -199,15 +244,27 @@ function generateBalanceChart(data) {
 	const highestBalance = Math.max(...balanceData);
 	const balancePercentChange = calculatePercentChange(balanceData);
 	const lowestPercentBalance =
-		calculatePercentChange([lowestBalance, initialBalance]) - 100;
+		((lowestBalance - initialBalance) / initialBalance) * 100;
 	const highestPercentBalance =
-		calculatePercentChange([highestBalance, initialBalance]) - 100;
+		((highestBalance - initialBalance) / initialBalance) * 100;
 
 	// Création des éléments de statistiques
 	createStatisticElement(
 		statisticsContainer,
-		"Balance Change",
+		"Percent Balance Change",
 		balancePercentChange.toFixed(2),
+		"%"
+	);
+	createStatisticElement(
+		statisticsContainer,
+		"Percent Lowest Balance Change",
+		lowestPercentBalance.toFixed(2),
+		"%"
+	);
+	createStatisticElement(
+		statisticsContainer,
+		"Percent Highest Balance Change",
+		highestPercentBalance.toFixed(2),
 		"%"
 	);
 	createStatisticElement(
@@ -222,22 +279,11 @@ function generateBalanceChart(data) {
 		highestBalance.toFixed(2),
 		"€"
 	);
-	createStatisticElement(
-		statisticsContainer,
-		"Lowest Balance Change",
-		lowestPercentBalance.toFixed(2),
-		"%"
-	);
-	createStatisticElement(
-		statisticsContainer,
-		"Highest Balance Change",
-		highestPercentBalance.toFixed(2),
-		"%"
-	);
+	let sign = balanceChange >= 0 ? "+" : "";
 	createStatisticElement(
 		statisticsContainer,
 		"Balance Change",
-		balanceChange.toFixed(2),
+		sign + balanceChange.toFixed(2),
 		"€"
 	);
 
