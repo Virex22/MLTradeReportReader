@@ -38,7 +38,7 @@ function generateProfitChart(data) {
 	const canvas = createCanvasElement("profit-chart", container, "Profit/Loss");
 
 	const ctx = canvas.getContext("2d");
-	new Chart(ctx, {
+	const chart = new Chart(ctx, {
 		type: "bar",
 		data: {
 			labels: profitLabels,
@@ -64,7 +64,50 @@ function generateProfitChart(data) {
 			maintainAspectRatio: true,
 		},
 	});
+
+	// Calcul des statistiques
+	const totalTrades = trades.length;
+	const winningTrades = trades.filter((trade) => trade.ProfitLoss >= 0);
+	const losingTrades = trades.filter((trade) => trade.ProfitLoss < 0);
+	const winningPercentage = (winningTrades.length / totalTrades) * 100;
+	const averageWin = calculateAverageProfit(winningTrades);
+	const averageLoss = calculateAverageProfit(losingTrades);
+
+	// Création des éléments de statistiques
+	const statisticsContainer = document.createElement("div");
+	statisticsContainer.classList.add("statistics-container");
+
+	const createStatisticElement = (label, value, unit = "") => {
+		const statisticElement = document.createElement("p");
+		statisticElement.classList.add("statistic");
+
+		// Créer un élément <span> pour la valeur
+		const valueElement = document.createElement("span");
+		valueElement.textContent = value.toFixed(2) + unit;
+		valueElement.classList.add("statistic-value");
+
+		// Ajouter le label et l'élément de valeur au conteneur de statistiques
+		statisticElement.innerHTML = `${label}: `;
+		statisticElement.appendChild(valueElement);
+
+		statisticsContainer.appendChild(statisticElement);
+	};
+	createStatisticElement("Total Trades", totalTrades);
+	createStatisticElement("Winning Trades", winningTrades.length);
+	createStatisticElement("Losing Trades", losingTrades.length);
+	createStatisticElement("Winning Percentage", winningPercentage, "%");
+	createStatisticElement("Average Win", averageWin, "€");
+	createStatisticElement("Average Loss", averageLoss, "€");
+
+	// Ajout du conteneur de statistiques sous le graphique
+	container.appendChild(statisticsContainer);
 }
+
+function calculateAverageProfit(trades) {
+	const totalProfit = trades.reduce((sum, trade) => sum + trade.ProfitLoss, 0);
+	return totalProfit / trades.length;
+}
+
 function generateBalanceChart(data) {
 	const trades = data.Trades;
 	const initialBalance = data.InitialBalance;
