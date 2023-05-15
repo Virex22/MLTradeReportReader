@@ -60,7 +60,6 @@ function createStatisticElement(statisticsContainer, label, value, unit = "") {
 	valueElement.textContent = value + unit;
 	valueElement.classList.add("statistic-value");
 
-	// Ajouter le label et l'élément de valeur au conteneur de statistiques
 	statisticElement.innerHTML = `${label}: `;
 	statisticElement.appendChild(valueElement);
 
@@ -85,8 +84,19 @@ function createCanvasElement(id, container, title) {
 
 function generateProfitChart(data) {
 	const trades = data.Trades;
-	const profitValues = trades.map((trade) => trade.ProfitLoss);
+	const platformFeePercentage = data.PlateformFeePercentage;
+
+	// Calcul du profit/loss en tenant compte des frais de la plateforme
+	const profitValues = trades.map((trade) => {
+		const profitLoss = trade.ProfitLoss;
+		const platformFee = Math.abs(profitLoss) * (platformFeePercentage / 100);
+		return profitLoss - platformFee;
+	});
 	const profitLabels = trades.map((_, index) => `Trade ${index + 1}`);
+	const platformFees = profitValues.map(
+		(profit) => Math.abs(profit) * (platformFeePercentage / 100)
+	);
+	const platformFeeColor = "orange";
 
 	const profitColors = profitValues.map((profit) =>
 		profit >= 0 ? "green" : "red"
@@ -107,6 +117,13 @@ function generateProfitChart(data) {
 					label: "Profit/Loss",
 					data: profitValues,
 					backgroundColor: profitColors,
+					stack: "stack1",
+				},
+				{
+					label: "Platform Fees",
+					data: platformFees,
+					backgroundColor: platformFeeColor,
+					stack: "stack1",
 				},
 			],
 		},
@@ -122,6 +139,11 @@ function generateProfitChart(data) {
 				},
 			},
 			maintainAspectRatio: true,
+			plugins: {
+				tooltip: {
+					mode: "x", // Afficher toutes les informations pour la position horizontale du curseur
+				},
+			},
 		},
 	});
 
@@ -132,6 +154,7 @@ function generateProfitChart(data) {
 	const winningPercentage = (winningTrades.length / totalTrades) * 100;
 	const averageWin = calculateAverageProfit(winningTrades);
 	const averageLoss = calculateAverageProfit(losingTrades);
+	const totalFee = platformFees.reduce((sum, fee) => sum + fee, 0);
 
 	// Création des éléments de statistiques
 	const statisticsContainer = document.createElement("div");
@@ -164,6 +187,12 @@ function generateProfitChart(data) {
 		statisticsContainer,
 		"Average Loss",
 		averageLoss.toFixed(2),
+		"€"
+	);
+	createStatisticElement(
+		statisticsContainer,
+		"Total Fee",
+		totalFee.toFixed(2),
 		"€"
 	);
 
