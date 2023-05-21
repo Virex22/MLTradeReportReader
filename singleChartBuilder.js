@@ -212,19 +212,16 @@ function calculatePercentChange(values) {
 function generateBalanceChart(data) {
 	const trades = data.Trades;
 	const initialBalance = data.InitialBalance;
+	const platformFeePercentage = data.PlateformFeePercentage;
 
 	// Calcul du solde du compte
-	const balanceData = trades.reduce(
-		(acc, trade, index) => {
-			const tradeProfitLoss = trade.ProfitLoss;
-			const previousBalance =
-				acc.length > 0 ? acc[acc.length - 1] : initialBalance;
-			const currentBalance = previousBalance + tradeProfitLoss;
-			acc.push(currentBalance);
-			return acc;
-		},
-		[initialBalance]
-	);
+	let currentBalance = initialBalance;
+	const balanceData = trades.map((trade) => {
+		const tradeProfitLoss = trade.ProfitLoss;
+		const platformFee = tradeProfitLoss * platformFeePercentage;
+		currentBalance += tradeProfitLoss - platformFee;
+		return currentBalance;
+	});
 
 	// Préparation des libellés pour l'axe x du graphique
 	const tradeLabels = trades.map((_, index) => `Trade ${index + 1}`);
@@ -243,7 +240,6 @@ function generateBalanceChart(data) {
 			},
 		],
 	};
-
 	// Configuration du graphique
 	const chartOptions = {
 		responsive: true,
