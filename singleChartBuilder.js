@@ -90,12 +90,12 @@ function generateProfitChart(data) {
 	// Calcul du profit/loss en tenant compte des frais de la plateforme
 	const profitValues = trades.map((trade) => {
 		const profitLoss = trade.ProfitLoss;
-		const platformFee = Math.abs(profitLoss) * (platformFeePercentage / 100);
+		const platformFee = trade.Amount * (platformFeePercentage / 100);
 		return profitLoss - platformFee;
 	});
 	const profitLabels = trades.map((_, index) => `Trade ${index + 1}`);
-	const platformFees = profitValues.map(
-		(profit) => Math.abs(profit) * (platformFeePercentage / 100)
+	const platformFees = trades.map(
+		(trade) => -trade.Amount * (platformFeePercentage / 100)
 	);
 	const platformFeeColor = "orange";
 
@@ -155,7 +155,7 @@ function generateProfitChart(data) {
 	const winningPercentage = (winningTrades.length / totalTrades) * 100;
 	const averageWin = calculateAverageProfit(winningTrades);
 	const averageLoss = calculateAverageProfit(losingTrades);
-	const totalFee = platformFees.reduce((sum, fee) => sum + fee, 0);
+	const totalFee = -platformFees.reduce((sum, fee) => sum + fee, 0);
 
 	// Création des éléments de statistiques
 	const statisticsContainer = document.createElement("div");
@@ -219,7 +219,7 @@ function generateBalanceChart(data) {
 	let currentBalance = initialBalance;
 	const balanceData = trades.map((trade) => {
 		const tradeProfitLoss = trade.ProfitLoss;
-		const platformFee = tradeProfitLoss * platformFeePercentage;
+		const platformFee = trade.Amount * (platformFeePercentage / 100);
 		currentBalance += tradeProfitLoss - platformFee;
 		return currentBalance;
 	});
