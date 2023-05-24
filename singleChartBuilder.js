@@ -5,6 +5,7 @@ function generateSingleChart(data) {
 	generateGlobalStatistics(data);
 	generateProfitChart(data);
 	generateBalanceChart(data);
+	generateTradeTypeChart(data);
 }
 function calculateProfitFactor(trades) {
 	const winningTrades = trades.filter((trade) => trade.ProfitLoss > 0);
@@ -354,4 +355,75 @@ function generateParametersTable(data) {
 
 	var container = document.getElementById("container");
 	container.appendChild(parametersContainer);
+}
+
+function generateTradeTypeChart(data) {
+	const container = document.getElementById("container");
+	// Extraction des données
+	const venteTrades = data.Trades.filter((trade) => trade.Type === "Sell");
+	const achatTrades = data.Trades.filter((trade) => trade.Type === "Buy");
+
+	const venteGagnantTrades = venteTrades.filter(
+		(trade) => trade.ProfitLoss > 0
+	);
+	const ventePerdantTrades = venteTrades.filter(
+		(trade) => trade.ProfitLoss < 0
+	);
+
+	const achatGagnantTrades = achatTrades.filter(
+		(trade) => trade.ProfitLoss > 0
+	);
+	const achatPerdantTrades = achatTrades.filter(
+		(trade) => trade.ProfitLoss < 0
+	);
+
+	const totalGagnantTrades =
+		venteGagnantTrades.length + achatGagnantTrades.length;
+	const totalPerdantTrades =
+		ventePerdantTrades.length + achatPerdantTrades.length;
+
+	// Préparation des données pour le graphique
+	const chartData = {
+		labels: ["Vente", "Achat", "Total"],
+		datasets: [
+			{
+				label: "Nombre de trades gagnants",
+				data: [
+					venteGagnantTrades.length,
+					achatGagnantTrades.length,
+					totalGagnantTrades,
+				],
+				backgroundColor: ["#4BC0C0", "#4BC0C0", "#4BC0C0"],
+				borderWidth: 1,
+			},
+			{
+				label: "Nombre de trades perdants",
+				data: [
+					ventePerdantTrades.length,
+					achatPerdantTrades.length,
+					totalPerdantTrades,
+				],
+				backgroundColor: ["#FF6384", "#FF6384", "#FF6384"],
+				borderWidth: 1,
+			},
+		],
+	};
+
+	// Configuration du graphique
+	const chartOptions = {
+		responsive: true,
+		maintainAspectRatio: false,
+	};
+
+	// Création du canvas pour le graphique
+	const canvasId = "trade-type-chart";
+	createCanvasElement(canvasId, container, "Nombre de trades par type");
+
+	// Génération du graphique
+	const ctx = document.getElementById(canvasId).getContext("2d");
+	new Chart(ctx, {
+		type: "bar",
+		data: chartData,
+		options: chartOptions,
+	});
 }
