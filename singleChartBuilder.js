@@ -382,28 +382,57 @@ function generateTradeTypeChart(data) {
 	const totalPerdantTrades =
 		ventePerdantTrades.length + achatPerdantTrades.length;
 
+	// Calcul des pourcentages
+	const totalTrades = data.Trades.length;
+	const pourcentageVenteGagnant = (
+		(venteGagnantTrades.length / venteTrades.length) *
+		100
+	).toFixed(2);
+	const pourcentageVentePerdant = (
+		(ventePerdantTrades.length / venteTrades.length) *
+		100
+	).toFixed(2);
+
+	const pourcentageAchatGagnant = (
+		(achatGagnantTrades.length / achatTrades.length) *
+		100
+	).toFixed(2);
+	const pourcentageAchatPerdant = (
+		(achatPerdantTrades.length / achatTrades.length) *
+		100
+	).toFixed(2);
+
+	const pourcentageTotalPerdant = (
+		(totalPerdantTrades / totalTrades) *
+		100
+	).toFixed(2);
+	const pourcentageTotalGagnant = (
+		(totalGagnantTrades / totalTrades) *
+		100
+	).toFixed(2);
+
 	// Préparation des données pour le graphique
 	const chartData = {
 		labels: ["Vente", "Achat", "Total"],
 		datasets: [
 			{
-				label: "Nombre de trades gagnants",
+				label: "Pourcentage de trades gagnants",
 				data: [
-					venteGagnantTrades.length,
-					achatGagnantTrades.length,
-					totalGagnantTrades,
+					pourcentageVenteGagnant,
+					pourcentageAchatGagnant,
+					pourcentageTotalGagnant,
 				],
-				backgroundColor: ["#4BC0C0", "#4BC0C0", "#4BC0C0"],
+				backgroundColor: ["#238823", "#238823", "#238823"],
 				borderWidth: 1,
 			},
 			{
-				label: "Nombre de trades perdants",
+				label: "Pourcentage de trades perdants",
 				data: [
-					ventePerdantTrades.length,
-					achatPerdantTrades.length,
-					totalPerdantTrades,
+					pourcentageVentePerdant,
+					pourcentageAchatPerdant,
+					pourcentageTotalPerdant,
 				],
-				backgroundColor: ["#FF6384", "#FF6384", "#FF6384"],
+				backgroundColor: ["#d2222d", "#d2222d", "#d2222d"],
 				borderWidth: 1,
 			},
 		],
@@ -413,11 +442,34 @@ function generateTradeTypeChart(data) {
 	const chartOptions = {
 		responsive: true,
 		maintainAspectRatio: false,
+		scales: {
+			y: {
+				beginAtZero: true,
+				ticks: {
+					callback: function (value) {
+						return value + "%";
+					},
+				},
+			},
+		},
+		plugins: {
+			tooltip: {
+				callbacks: {
+					label: function (context) {
+						let label = context.dataset.label || "";
+						if (label) {
+							label += ": ";
+						}
+						label += context.parsed.y + "%";
+						return label;
+					},
+				},
+			},
+		},
 	};
-
 	// Création du canvas pour le graphique
 	const canvasId = "trade-type-chart";
-	createCanvasElement(canvasId, container, "Nombre de trades par type");
+	createCanvasElement(canvasId, container, "Pourcentage de trades par type");
 
 	// Génération du graphique
 	const ctx = document.getElementById(canvasId).getContext("2d");
