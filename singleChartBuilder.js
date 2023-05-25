@@ -478,4 +478,31 @@ function generateTradeTypeChart(data) {
 		data: chartData,
 		options: chartOptions,
 	});
+
+	const volumeTotal = data.Trades.reduce(
+		(total, trade) => total + trade.Amount,
+		0
+	);
+
+	// Création des éléments de statistiques
+	const statisticsContainer = document.createElement("div");
+	statisticsContainer.classList.add("statistics-container");
+
+	createStatisticElement(
+		statisticsContainer,
+		"Pourcentage de trades gagnants",
+		pourcentageTotalGagnant + "%"
+	);
+	createStatisticElement(
+		statisticsContainer,
+		"Pourcentage de trades perdants",
+		pourcentageTotalPerdant + "%"
+	);
+	createStatisticElement(
+		statisticsContainer,
+		"Volume total des trades",
+		volumeTotal.toFixed(2) + "€"
+	);
+
+	container.appendChild(statisticsContainer);
 }
